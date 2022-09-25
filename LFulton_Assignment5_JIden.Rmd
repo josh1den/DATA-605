@@ -1,0 +1,266 @@
+---
+title: "HW5"
+author: "Josh Iden"
+date: "2022-09-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+
+(Bayesian). A new test for multinucleoside-resistant (MNR) human immunodeficiency virus type 1 (HIV-1) variants was recently developed. The test maintains 96% sensitivity, meaning that, for those with the disease, it will correctly report "positive" for 96% of them. The test is also 98% specific, meaning that, for those without the disease, 98% will be correctly reported as "negative." MNR HIV-1 is considered to be rare (albeit emerging), with about a .1% or .001 prevalence rate. Given the prevalence rate, sensitivity, and specificity estimates, what is the probability that an individual who is reported as positive by the new test actually has the disease? If the median cost (consider this the best point estimate) is about \$100,000 per positive case total and the test itself costs \$1000 per administration, what is the total first-year cost for treating 100,000 individuals?
+
+First, we calculate the Positive Predictive Value
+
+Probability of disease: $P(A)$
+
+Probability of positive test: $P(B)$
+
+Probability of observing $A$ if $B$ is [true]{.underline}:
+
+$$
+P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+$$
+
+We're given $P(A)$ (prevalence) and $P(B|A)$ (sensitivity). We can get $P(B)$ by adding the true positives with the false positives.
+
+```{r question_1.1}
+# initialize variables
+sensitivity <- .96 # P(B|A)
+specificity <- .98
+prevalence <- .001 # P(A)
+total_positives <- (sensitivity * prevalence) + ((1-specificity)*(1-prevalence)) # P(B)
+
+# probability that an individual reported positive has the disease
+
+ppv <- (sensitivity * prevalence) / total_positives
+print(round(ppv,4))
+```
+
+The reason this figure is so low is because of the incredibly low prevalence of the disease.
+
+Next, we calculate the total first-year cost of treating 100,000 individuals.
+
+```{r question_1.2}
+sample <- 100000 #100,000 individuals
+test_cost <- 1000 #$1000 per test
+treatment_cost <- 100000 #$100000 per true positive
+
+# calculate first year cost: fyc
+fyc <- (sample * test_cost) + ((sample * total_positives) * treatment_cost)
+print(fyc)  
+```
+
+The total first year cost to test 100,000 patients and treat all patients that test positive is \$309,400,000.
+
+### Question 2
+
+(Binomial). The probability of your organization receiving a Joint Commission inspection in any given month is .05. What is the probability that, after 24 months, you received exactly 2 inspections? What is the probability that, after 24 months, you received 2 or more inspections? What is the probability that your received fewer than 2 inspections? What is the expected number of inspections you should have received? What is the standard deviation?
+
+```{r question_2_initialiaze}
+#initialize variaables
+n <- 24 # number of months
+p <- 0.05 # probability
+```
+
+Piece by piece,
+
+What is the probability that, after 24 months, you received exactly 2 inspections?
+
+```{r question_2.1}
+dbinom(2, size=n, prob=p)
+```
+
+What is the probability that, after 24 months, you received 2 or more inspections?
+
+```{r question_2.2}
+pbinom(1, n, p, lower.tail=FALSE)
+```
+
+What is the probability that your received fewer than 2 inspections?
+
+```{r question_2.3}
+pbinom(1, n, p)
+```
+
+What is the expected number of inspections you should have received? What is the standard deviation?
+
+$Ε(Χ) = μ = n * p$ $σ = \sqrt(n*p * (1-p))$
+
+```{r question_2.4}
+μ <- n * p
+σ <- sqrt(n*p * (1-p))
+print(paste("μ:", μ))
+print(paste("σ:", σ))
+```
+
+### Question 3
+
+(Poisson). You are modeling the family practice clinic and notice that patients arrive at a rate of 10 per hour. What is the probability that exactly 3 arrive in one hour? What is the probability that more than 10 arrive in one hour? How many would you expect to arrive in 8 hours? What is the standard deviation of the appropriate probability distribution? If there are three family practice providers that can see 24 templated patients each day, what is the percent utilization and what are your recommendations?
+
+```{r question_3_intialize}
+r <- 10 #rate per hour
+```
+
+What is the probability that exactly 3 arrive in one hour?
+
+```{r question_3.1}
+dpois(3,r)
+```
+
+What is the probability that more than 10 arrive in one hour? 
+
+```{r question 3.2}
+1 - ppois(10,r)
+```
+
+How many would you expect to arrive in 8 hours?
+
+```{r question_3.3}
+r * 8
+```
+
+What is the standard deviation of the appropriate probability distribution? 
+
+In a Poisson distribution, the standard deviation is always equal to the square root of the mean:
+
+```{r question_3.4}
+sqrt(r)
+```
+
+If there are three family practice providers that can see 24 templated patients each day, what is the percent utilization and what are your recommendations?
+
+```{r question_3.5}
+(r * 8) / (3 * 24)
+```
+
+111% utilization. Shut doors to new arrivals 30 minutes before the office closes. 
+
+### Question 4
+
+(Hypergeometric). Your subordinate with 30 supervisors was recently accused of favoring nurses. 15 of the subordinate’s workers are nurses and 15 are other than nurses. As evidence of malfeasance, the accuser stated that there were 6 company-paid trips to Disney World for which everyone was eligible. The supervisor sent 5 nurses and 1 non-nurse. If your subordinate acted innocently, what was the probability he/she would have selected five nurses for the trips? How many nurses would we have expected your subordinate to send? How many non-nurses would we have expected your subordinate to send?
+
+For the first question, we can use the dhyper() function: 
+
+```{r question_4.1}
+library(stats)
+x <- 5 # number of nurses to draw from sample without replacement
+m <- 15 # number of nurses in sample
+n <- 15 # number of non-nurses in sample
+k <- 6 # total to draw from sample
+p <- 0.5 # probability
+
+dhyper(x, m, n, k, p)
+```
+
+Since the sample is binomial and there is an equal number of nurses and non-nurses, the expected nurses and non-nurses will be the same:
+
+```{r question_4.2}
+k*p
+```
+
+### Question 5
+
+(Geometric). The probability of being seriously injured in a car crash in an unspecified location is about .1% per hour. A driver is required to traverse this area for 1200 hours in the course of a year. What is the probability that the driver will be seriously injured during the course of the year? In the course of 15 months? What is the expected number of hours that a driver will drive before being seriously injured? Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the next 100 hours?
+
+What is the probability that the driver will be seriously injured during the course of the year?
+
+```{r question 5.1}
+p <- 0.001 # probability
+h <- 1200 # hours
+m <- 1200/12 * 15 # 15 months
+
+pgeom(h, p)
+```
+
+In the course of 15 months?
+
+```{r question_5.2}
+pgeom(m, p)
+```
+
+What is the expected number of hours that a driver will drive before being seriously injured?
+
+$E(X) = 1/p$
+
+```{r question_5.3}
+1/p
+```
+
+Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the next 100 hours?
+
+```{r question_5.4}
+pgeom(100, p)
+```
+
+### Question 6
+
+You are working in a hospital that is running off of a primary generator which fails about once in 1000 hours. What is the probability that the generator will fail more than twice in 1000 hours? What is the expected value?
+
+```{r question_6.1}
+p <- 1/1000 #probability
+pbinom(2, 1000, p, lower.tail=FALSE )
+```
+
+The expected value is 1.
+
+### Question 7
+
+A surgical patient arrives for surgery precisely at a given time. Based on previous analysis (or a lack of knowledge assumption), you know that the waiting time is uniformly distributed from 0 to 30 minutes. What is the probability that this patient will wait more than 10 minutes? If the patient has already waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being seen? What is the expected waiting time?
+
+What is the probability that this patient will wait more than 10 minutes?
+
+```{r question_7.1}
+punif(10, 0, 30, lower.tail=FALSE)
+```
+
+If the patient has already waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being seen?
+
+```{r question_7.2}
+punif(15, 10, 30, lower.tail=FALSE)
+```
+
+What is the expected waiting time?
+
+$E(X) = \frac{(a+b)}{2}$
+
+```{r question_7.3}
+a <- 0 # minimum wait time
+b <- 30 # maximum wait time
+
+(a+b)/2
+```
+
+### Question 8
+
+Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10 years (expected value). Based on previous studies, we know that the failure of most MRIs obeys an exponential distribution. What is the expected failure time? What is the standard deviation? What is the probability that your MRI will fail after 8 years? Now assume that you have owned the machine for 8 years. Given that you already owned the machine 8 years, what is the probability that it will fail in the next two years?
+
+What is the expected failure time?
+
+$E(X) = 10$
+
+What is the standard deviation?
+
+The standard deviation in an exponential distribution is always equal to the expected value:
+
+$σ = μ = Ε(Χ) = 10$
+
+What is the probability that your MRI will fail after 8 years?
+
+```{r question_8.1}
+μ <- 10
+m <- 1/μ # decay parameter/ rate
+pexp(8, m, lower.tail=FALSE)
+```
+
+Given that you already owned the machine 8 years, what is the probability that it will fail in the next two years?
+
+```{r question_8.2}
+pexp(8, m, lower.tail=FALSE) - pexp(10, m, lower.tail=FALSE)
+```
+
+
+
