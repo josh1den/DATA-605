@@ -1,0 +1,41 @@
+---
+title: "DATA 605 HW10"
+author: "Josh Iden"
+date: "2022-10-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](/Users/joshiden/Downloads/Screen%20Shot%202022-10-28%20at%204.43.40%20PM.png)
+
+This is a [Gambler's Ruin](https://towardsdatascience.com/the-gamblers-ruin-problem-9c97a7747171) problem, where $q_k$ is the probability that the gambler's stake reaches $0$ before it reaches $M$, given the initial stake $k$, with any $z$ with $1 \leq z \leq M$:
+
+$q_k = \frac{(\frac{q}{p})^z - 1}{(\frac{q}{p})^M - 1}$
+
+a)  The probability of betting \$1 each time:
+
+```{r}
+M = 8 #desired total
+z = 1 # initial stake
+p = 0.4 # probability of winning
+q = 1-p # probability of losing
+
+qk = (1 - (q/p)^z) / (1 - (q/p)^M)
+qk
+```
+
+b)  Probability of betting as much as possible to bring his fortune up to \$8:
+
+To bet as much as possible, then $z_0 = 1, z_1 = 2, z_2 = 4, z_3 = 8$, and calculating the probabilty $p$ that the player wins $z$ straight times:
+
+```{r}
+z = 3 # no. of times
+p^z
+```
+
+c)  Which strategy gives the better chance of getting out of jail?
+
+Betting the farm each time!

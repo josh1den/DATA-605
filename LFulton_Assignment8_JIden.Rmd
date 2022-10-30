@@ -1,0 +1,104 @@
+---
+title: "LFulton_Assignment8_JIden"
+author: "Josh Iden"
+date: "2022-10-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Question 1
+
+![](/Users/joshiden/Downloads/11.png)
+
+μ = 1000 (mean of exponential density of individual variable )
+
+n = 100 (number of light bulbs)
+
+The density of minimum value among n independent random variables with an exponential density has mean $\frac{μ}{n}$,
+
+So the mean of the minimum value (first bulb to burn out) is:
+
+```{r}
+μ = 1000
+n = 100
+
+print(μ/n)
+```
+
+### Question 2
+
+![](/Users/joshiden/Downloads/14.png)
+
+$fz(z) = (\frac{1}{2})e^{-λ|z|}$ can be rewritten as: $$
+fz(z) = \begin{cases}
+    (\frac{1}{2})e^{-λ|z|},    z \geq 0\\
+    (\frac{1}{2})e^{λ|z|},      z < 0
+\end{cases}
+$$
+
+Since $X_1$ and $X_2$ have exponential density, their PDF is:
+
+$$
+fx(x_1) = fx(x_2) = \begin{cases}
+    λe^{-λx},   x \geq 0\\
+    0, otherwise
+\end{cases}
+$$
+
+So the combined density is $λ^2e^{-λ(χ_1 + χ_2)}$
+
+If $z = x_1 - x_2$ then $x_1 = z + x_2$ $=>$
+
+If $z \geq 0$, then $x_1 = (z + x_2) \geq 0$ and
+
+$fz(z) = \int_{z}^{∞} λ^2e^{-λ(z + 2x_2)}, dx_2 = \frac{1}{2}λe^{-λz}$
+
+If $z < 0$, then $x_1 = (z + x_2) > 0$ and
+
+$fz(z) = \int_{0}^{∞} λ^2e^{λ(z + 2x_2)}, dx_2 = \frac{1}{2}λe^{λz}$
+
+then $$
+fz(z) = \begin{cases}
+    (\frac{1}{2})e^{-λz},    z \geq 0\\
+    (\frac{1}{2})e^{λz},      z < 0
+\end{cases}
+$$
+
+### Question 3
+
+![](/Users/joshiden/Downloads/1a1.png) ![](/Users/joshiden/Downloads/1b.png)
+
+Chebyschev inequality states:
+
+$P(| X - μ | \geq kσ ) \leq \frac{1}{k^2}$
+
+$μ$ is given as 10, with $σ^2$ as $\frac{100}{3}$, so $σ = \frac{10}{\sqrt(3)}$
+
+Thus,
+
+a)  $k(\frac{10}{\sqrt(3)}) = 2 \implies k = 0.3464$
+
+so, $\frac{1}{k^2} = 8.338$
+
+Since the upper bound cannot exceed 1, the upper bound is 1.
+
+b)  $k(\frac{10}{\sqrt(3)}) = 5 \implies k = 0.86602$
+
+so, $\frac{1}{k^2} = 1.33334$
+
+Since the upper bound cannot exceed 1, the upper bound is 1.
+
+c)  $k(\frac{10}{\sqrt(3)}) = 9 \implies k = 1.55884$
+
+so, $\frac{1}{k^2} = 0.41152$
+
+The upper bound is 0.41152.
+
+d)  $k(\frac{10}{\sqrt(3)}) = 20 \implies k = 3.4641$
+
+so, $\frac{1}{k^2} = 0.08333$
+
+The upper bound is 0.08333.

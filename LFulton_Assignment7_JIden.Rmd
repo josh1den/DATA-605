@@ -1,0 +1,84 @@
+---
+title: "LFulton_Assignment7_JIden"
+author: "Josh Iden"
+date: "2022-10-09"
+output: html_document
+---
+
+### HW7
+
+#### 1. Let X1, X2, . . . , Xn be n mutually independent random variables, each of which is uniformly distributed on the integers from 1 to k. Let Y denote the minimum of the Xi's. Find the distribution of Y
+
+Let $k^n$ be the combinations for $Xi$ for integers $1$ to $k$   
+
+Let $j$ be the combinations for minimum $k^n$
+
+$Y = 1 \le j \le k, \frac{(k - j + 1)^n - (k - j)^n}{k^n}$
+
+#### 2. Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer's expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.)
+
+##### a. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years..)
+
+The expected value is given: $E(X) = 10$
+The probability is given: $p = \frac{1}{10} = 0.1$
+Standard deviation = $\frac{\sqrt{1-p}}{p}$
+
+```{r}
+p <- 0.1 #probability
+std <- round((1-p)**0.5/p,2)
+print(paste("Standard Deviation:",std))
+```
+
+
+The probability function for a geometric distribution:
+$P(X = x) = (1 - p)^{x-1} * p =>$
+
+With X = 8 (years):
+$P(X = 8) = (1 - p)^{8-1} * p$
+
+in R:
+
+```{r}
+x <- 8 #number of years
+pgeom(x, p) 
+```
+
+= the probability the machine will fail after 8 years (will not fail in first 8 years) as a geometric distribution.
+
+#### b. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as an exponential.
+
+```{r}
+pexp(x, p)
+```
+
+The standard deviation in an exponential distribution is equal to the expected value: 10.
+
+#### c. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years)
+
+```{r}
+pbinom(0, x, p, lower.tail=FALSE)
+```
+
+Computing the expected value and standard deviation:
+
+```{r}
+exp <- x * p
+var <- x * p * (1-p)
+std <- round(sqrt(var),2)
+
+print(paste("Expected value:",exp))
+print(paste("Standard deviation:",std))
+```
+
+#### d. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a Poisson.
+
+```{r}
+lambda <- 10 #expected value
+st_d <- round(sqrt(lambda),2) #standard deviation
+prob <- round(ppois(x, lambda, lower.tail=FALSE),2)
+
+print(paste("Expected value:",lambda))
+print(paste("Standard deviation",st_d))
+print(paste("Probability of failure after 8 years:",prob))
+```
+

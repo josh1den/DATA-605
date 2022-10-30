@@ -1,0 +1,109 @@
+---
+title: "DATA 605 HW 9"
+author: "Josh Iden"
+date: "2022-10-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/Q1.png)
+
+```{r}
+n = 364 #rest of year
+m = 0 #mean
+EX = 100 #expected value
+var = 1/4 #σ^2
+barvar = n * var
+barsd = sqrt(barvar)
+```
+
+$>= 100$:
+
+```{r}
+z = (100 - EX) / barsd
+pnorm(z, lower.tail=FALSE)
+```
+
+$>= 110$:
+
+```{r}
+z = (110 - EX) / barsd
+pnorm(z, lower.tail=FALSE)
+```
+
+$>= 120$
+
+```{r}
+z = (120 - EX) / barsd
+pnorm(z, lower.tail=FALSE)
+```
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/Q2.png)
+
+Given the binomial PMF:
+
+$P_x = (\frac{n}{x})p^x(1 - p)^{n - x}$
+
+Where $P_x$ is the probability of $x$ successes within $n$ trials and (\frac{n}{x}) is the number of combinations of $x$ in $n$, and the Moment Generating Function:
+
+$M_x(t) = E(e^{tx})$
+
+Which is the expected value of $x$ at moment $t$, combining with the PMF of the binomial distribution yields the functions:
+
+$M(t) = \sum^{n}_{x=0}e^{tx} * (\frac{n}{x})p^x(1 - p)^{n - x}$
+
+Which simplifies to $M(t) = (pe^t + 1 - p)^n$ when $t$ is a real number.
+
+To get the first moment, take the first derivative and evaluate at 0. 
+
+First derivative:
+$M'(t) = npe^t(pe^t - p + 1)^{n-1}$ 
+
+Evaluate at 0:
+$M'(0) = npe^0(pe^0 - p + 1)^{n-1} \Longrightarrow np(p - p + 1)^{n-1} \Longrightarrow np(1)^{n-1} \Longrightarrow np$
+
+So the expected value is $np$.
+
+For the variance, take the second derivative and evaluate at 0:
+
+$M"(t) = npe^t(pe^t - p + 1)^{n-2}(npe^t - p + 1)$ 
+
+Evaluate at 0:
+
+$M"(0) = npe^0(pe^0 - p + 1)^{n-2}(npe^0 - p + 1) \Longrightarrow np(np - p + 1)$
+
+So the variance is $np(np - p + 1)$.
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/Q3.png)
+
+For the exponential distribution, given the PDF: 
+
+$f(x) = λe^{-λx}$
+
+And the Moment Generating Function:
+
+$M(t)=\int^\inf_0 e^{tx}*λ e^{-λ x} = \frac{λ}{λ-t}, t < λ$
+
+We take the first derivative for the expected value at 0:
+
+$M'(t) = \frac{λ}{(λ-t)^2} \Longrightarrow$
+
+$E[X] = M'(0) = \frac{λ}{(λ-0)^2} \Longrightarrow \frac{λ}{λ^2}\Longrightarrow \frac{1}{λ}$
+
+So the expected value is $\frac{1}{λ}$.
+
+We take the second derivative for the variance to get the second moment of the distribution:
+
+$E[X^2] = M''(t) = \int^∞_0 t^2λε^{-λχ}= \frac{2}{λ^2}$ 
+
+And the variance of the continuous random variable is caluclated as:
+
+$VAR[X] = E[X^2] - E[X]^2 \Longrightarrow$
+
+$VAR[X] = \frac{2}{λ^2}- \frac{1}{λ^2} \Longrightarrow \frac{1}{λ^2}$
+
+So the variance is $\frac{1}{λ^2}$.
+

@@ -1,0 +1,117 @@
+---
+title: "LFulton_Assignment6_JIden"
+author: "Josh Iden"
+date: "2022-10-02"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 6
+
+### 1. A bag contains 5 green and 7 red jellybeans. How many ways can 5 jellybeans be withdrawn from the bag so that the number of green ones withdrawn will be less than 2?
+
+```{r q1}
+choose(5,0)*choose(7,5)+choose(5,1)*choose(7,4)
+```
+
+### 2. A certain congressional committee consists of 14 senators and 13 representatives. How many ways can a subcommittee of 5 be formed if at least 4 of the members must be representatives?
+
+```{r q2}
+choose(13,4)*choose(14,1)+choose(13,5)
+```
+
+### 3. If a coin is tossed 5 times, and then a standard six-sided die is rolled 2 times, and finally a group of three cards are drawn from a standard deck of 52 cards without replacement, how many different outcomes are possible?
+
+```{r q3}
+coin <- 2**5 # no. of outcomes
+die <- 6**2 # of outcomes
+deck <- choose(52,3)
+
+coin*die*deck
+```
+
+### 4. 3 cards are drawn from a standard deck without replacement. What is the probability that at least one of the cards drawn is a 3? Express your answer as a fraction or a decimal number rounded to four decimal places.
+
+```{r q4}
+noprob <- choose(48,3) # probability that no cards are a 3
+threeprob <- choose(52,3) # probability of choosing a 3
+
+round(1 - noprob/threeprob, 4)
+```
+
+### 5. Lorenzo is picking out some movies to rent, and he is primarily interested in documentaries and mysteries. He has narrowed down his selections to 17 documentaries and 14 mysteries.
+
+#### Step 1. How many different combinations of 5 movies can he rent?
+
+```{r q5.1}
+choose(31,5)
+```
+
+#### Step 2. How many different combinations of 5 movies can he rent if he wants at least one mystery?
+
+```{r q5.2}
+nomyst <- choose(17,5) # combination of no mysteries
+totalcomb <- choose(31,5) # total combinations
+
+totalcomb - nomyst
+```
+
+### 6. In choosing what music to play at a charity fund raising event, Cory needs to have an equal number of symphonies from Brahms, Haydn, and Mendelssohn. If he is setting up a schedule of the 9 symphonies to be played, and he has 4 Brahms, 104 Haydn, and 17 Mendelssohn symphonies from which to choose, how many different schedules are possible? Express your answer in scientific notation rounding to the hundredths place.
+
+```{r q6}
+brahms <- choose(4,3)
+haydn <- choose(104,3)
+mendel <- choose(17,3)
+format((brahms*haydn*mendel)*factorial(9), digits=3, scientific=TRUE)
+```
+
+### 7. An English teacher needs to pick 13 books to put on his reading list for the next school year, and he needs to plan the order in which they should be read. He has narrowed down his choices to 6 novels, 6 plays, 7 poetry books, and 5 nonfiction books.
+
+#### Step 1. If he wants to include no more than 4 nonfiction books, how many different reading schedules are possible? Express your answer in scientific notation rounding to the hundredths place.
+
+```{r q7.1}
+total_outcomes <- choose(24,13)
+five_nons <- choose(19,8)
+
+format((total_outcomes-choose(5,5)*five_nons)*factorial(13), digits=3, scientific=TRUE)
+```
+
+#### Step 2. If he wants to include all 6 plays, how many different reading schedules are possible? Express your answer in scientific notation rounding to the hundredths place. 
+
+```{r q7.2}
+format(choose(6,6)*choose(18,7)*factorial(13), digits=3, scientific=TRUE)
+```
+
+### 8. Zane is planting trees along his driveway, and he has 5 sycamores and 5 cypress trees to plant in one row. What is the probability that he randomly plants the trees so that all 5 sycamores are next to each other and all 5 cypress trees are next to each other? Express your answer as a fraction or a decimal number rounded to four decimal places.
+
+```{r q8}
+total_outcomes <- choose(10,5)
+desired_outcomes <- 2 # there's only two ways all 5 trees are next to each other
+
+round(desired_outcomes/total_outcomes,4)
+```
+
+### 9. If you draw a queen or lower from a standard deck of cards, I will pay you $4. If not, you pay me $16. (Aces are considered the highest card in the deck.)
+
+#### Step 1. Find the expected value of the proposition. Round your answer to two decimal places. Losses must be expressed as negative values.
+
+```{r q9.1}
+ql <- 44/52 # prob of queen or lower
+ql_pay <- 4 # pay for queen or lower
+ka <- 8/52 # prob of king or ace
+ka_cost <- -16 # cost for king or ace
+
+expected_value <- round(ql_pay*ql + ka_cost*ka, 2)
+expected_value
+```
+
+#### Step 2. If you played this game 833 times how much would you expect to win or lose? Round your answer to two decimal places. Losses must be expressed as negative values.
+
+```{r q9.2}
+games_played <- 833
+round(expected_value * games_played, 2)
+```
+

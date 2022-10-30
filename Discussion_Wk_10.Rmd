@@ -1,0 +1,32 @@
+---
+title: "DATA 605 Discussion - Week 10"
+author: "Josh Iden"
+date: "2022-10-26"
+output: html_document
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+![](/Users/joshiden/Downloads/Screen%20Shot%202022-10-26%20at%2010.32.42%20AM.png)
+
+![](/Users/joshiden/Downloads/Screen%20Shot%202022-10-26%20at%2010.32.59%20AM.png)
+
+The $ij$th entry $p^{(n)}_{ij}$ of the matrix $P^n$ gives the probabilty that the Markov chain, starting in state $s_i$ will be in state $s_j$ after $n$ steps.
+
+```{r, warning=FALSE, message=FALSE}
+library(expm)
+labels <- c("H","Y","D")
+T_mat <- matrix(c(0.8,0.2,0.0, # transition matrix
+                  0.3,0.4,0.3,
+                  0.2,0.1,0.7),
+                nrow=3,
+                byrow=TRUE,
+                dimnames=list(labels,labels))
+T_mat
+T_mat %*% T_mat
+T_mat %^% 2
+```
+
+Grandson = 2nd step. The probability is 0.7.
