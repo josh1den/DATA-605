@@ -1,0 +1,113 @@
+---
+title: "LFulton_Assignment1"
+author: "Josh Iden"
+date: "2022-09-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## HW1
+
+(HW=Homework!)
+
+One of the most useful applications for linear algebra in data science is image manipulation.  We often need to compress, expand, warp, skew, etc. images.  To do so, we left multiply a transformation matrix by each of the point vectors.  
+
+For this assignment, build the first letters for both your first and last name using point plots in R.  For example, the following code builds an H.
+
+x=c(rep(0,500),seq(0,1,length.out=1000), rep(1,500))
+
+y=c(seq(-1,1,length.out=500),rep(0,1000), seq(-1,1,length.out=500))
+
+z=rbind(x,y)
+
+plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
+
+Then, write R code that will left multiply (%>%) a square matrix (x) against each of the vectors of points (y). Initially, that square matrix will be the Identity matrix.  
+
+Use a loop that changes the transformation matrix incrementally to demonstrate 1) shear, 2) scaling, 3)  rotation , and 4) projection in animated fashion.  
+
+Hint:  Use x11() to open a new plotting window in R.
+
+Upload your document as a .RMD file.  I will know if your assignment is correct if the animation runs correctly.
+
+### Plot the first letter of my last name: I
+
+```{r}
+# first letter of last name
+x=c(rep(0,500),seq(-0.25,0.25,length.out=500),seq(-0.25,0.25,length.out=500)) #rep(1,500))
+y=c(seq(-1,1,length.out=500),rep(-1,500), rep(1,500))
+z=rbind(x,y)
+plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
+```
+
+### Perform transformations and animation
+
+You can also embed plots, for example:
+
+```{r}
+# animation
+library(animation)
+
+myani=ani.record(reset = TRUE, replay.cur = FALSE)
+
+a=diag(2)
+
+start_time <- Sys.time()
+x11()
+           
+for (i in seq(-3,3,length.out=100)){
+  a[1,1]=i
+  newmat=apply(z,2,function(x) a%*%x)
+  plot(newmat[2,]~newmat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+  #Sys.sleep(1)
+}
+
+a=diag(2) 
+for (i in seq(-3,3,length.out=100)){
+  
+  a[1,2]=i
+  newmat=apply(z,2,function(x) a%*%x)
+  plot(newmat[2,]~newmat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+  #Sys.sleep(1)
+}
+
+a=diag(2) 
+for (i in seq(-3,3,length.out=100)){
+  
+  a[2,1]=i
+  newmat=apply(z,2,function(x) a%*%x)
+  plot(newmat[2,]~newmat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+  #Sys.sleep(1)
+}
+
+a=diag(2) 
+for (i in seq(-3,3,length.out=100)){
+  
+  a[2,2]=i
+  newmat=apply(z,2,function(x) a%*%x)
+  plot(newmat[2,]~newmat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+  #Sys.sleep(1)
+}
+
+myf=function(x){matrix(c(cos(x), -sin(x), sin(x), cos(x)), byrow=TRUE, nrow=2)}
+
+for (i in seq(0,20,length.out=100)){
+  a=myf(i)
+  newmat=apply(z,2,function(x) a%*%x)
+  plot(newmat[2,]~newmat[1,], xlim=c(-3,3), ylim=c(-3,3))
+  ani.record()
+  #Sys.sleep(1)
+}
+
+end_time <- Sys.time()
+elapsed_time <- end_time - start_time
+print(elapsed_time)
+```
+
