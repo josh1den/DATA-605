@@ -1,0 +1,129 @@
+---
+title: "HW2"
+author: "Josh Iden"
+date: "2022-09-01"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## DATA 605: Assignment 2
+
+### Problem Set #1
+
+*1) Show that* $A^tA ≠ AA^t$ *in general. Proof and demonstration.*
+
+We know from its definition that matrix multiplication is **not commutative**, so, generally speaking $A^tA ≠ AA^t$.
+
+Example:
+
+```{r}
+# define a 2x2 matrix
+A <- matrix(seq(1,4),2)
+print(A)
+```
+
+```{r}
+# define the transpose 
+T <- t(A)
+print(T)
+```
+
+```{r}
+# check for equality
+T%*%A == A%*%T
+```
+
+*2) For a special type of square matrix, we get* $A^tA ≠ AA^t$. *Under what conditions is this true?*
+
+Square matrices **are commutative** when they are **symmetrical**, meaning $A^t = A$.
+
+Example:
+
+```{r}
+# define a symmetrical matrix
+A <- matrix(c(1,2,2,4),nrow=2)
+A
+```
+
+```{r}
+# take the transpose of the matrix
+T <- t(A)
+T
+```
+
+```{r}
+# check for equality
+T%*%A == A%*%T
+```
+
+### Problem Set #2
+
+*Write an R function to factorize a square matrix A into LU or LDU*
+
+This rudimentary function takes a 2x2 matrix and returns the lower and upper triangular matrices:
+
+```{r}
+library(matlib)
+library(pracma)
+
+# define a square matrix
+A <- matrix(c(2,6,1,8),2)
+
+## define function LUD 2x2
+LUD2 <- function(A) {
+  # define row coefficient: B
+  B <- A[2,1] / A[1,1]
+  # define upper triangular matrix: U
+  U <- A
+  U[2.1] <- A[2,1] - B * A[1,1]
+  U[2,2] <- A[2,2] - B * A[1,2]
+  # define lower triangular matrix: L
+  L <- diag(dim(A)[1])
+  L[2,1] <- -B
+  output <- list("Lower"=L, "Upper"=U)
+  return(output)
+}
+
+LUD2(A)
+```
+
+Building on the above, this function takes larger matrices and returns the lower and upper triangular matrices.
+
+```{r}
+# define a 3x3 matrix
+D <- matrix(c(1,2,3,4,5,6,7,8,9), 3)
+
+## define function LUD3
+LUD3 <- function(A) {
+  # check dimension
+  if (dim(A)[1] != dim(A)[2]) stop ("not a square matrix")
+  # initialze uppper triangle: U
+  U <- A
+  # initialize lower triangle: L
+  L <- diag(dim(A)[1])
+  
+  # iterate through rows
+  for (i in 1:nrow(A)) {
+    for (j in 2:nrow(A)) {
+      if (j > i) {
+        # define row val: x
+        x <- U[i,]
+        # define row coefficient: B
+        B <- U[j,i] / x[i]
+        U[j,] <- U[j,] - (B * x)
+        L[j,i] <- B
+      }
+    }
+  }
+  
+  output <- list("Lower"=L, "Upper"=U)
+  return(output)
+}
+
+LUD3(D)
+```
