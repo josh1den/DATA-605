@@ -1,0 +1,182 @@
+---
+title: "DATA 605 HW13"
+author: "Josh Iden"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+------------------------------------------------------------------------
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW13/q1.png)
+
+------------------------------------------------------------------------
+
+First move the constant out front, $$
+= 4 * \int{e^{-7x}dx}
+$$ Substitute u, $$
+u = -7x \rightarrow \frac{du}{dx}= -7 \rightarrow du = -7dx \rightarrow dx = -\frac{1}{7}du
+$$ $$
+= 4 * \int{e^udx} \rightarrow e^u-\frac{1}{7}du \rightarrow -\frac{1}{7}e^udu
+$$ $$
+= 4 * \int{-\frac{1}{7}e^udu}
+$$
+
+Since $$\int{e^udu} = e^u$$
+
+$$= 4(-\frac{1}{7}e^u)$$ and $$e^u = -7x$$ so
+
+$$= 4(-\frac{1}{7}e^{-7x}) \rightarrow -\frac{4}{7}e^{-7x}$$ Add a
+constant $C$ to the solution,
+
+$$= -\frac{4}{7}e^{-7x} + C$$
+
+------------------------------------------------------------------------
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW13/q2.png)
+
+------------------------------------------------------------------------
+
+Given $t = 1$ and $N(1) = 6530$,
+
+$\frac{dN}{dt} = -\frac{3150}{t^4}-220 = -3150t^{-4}-220$
+
+$N( t ) = \int{-3150t^{-4}-220 dt}$
+
+$= \frac{-3150t^{-3}}{-3} - 220t + C$
+
+$N(t) = \frac {1050}{t^3} - 220t + C$
+
+Since $N(1) = 6530$,
+
+$6530 = \frac {1050}{1^3} - 220(1) + C$
+
+$\Rightarrow 6530 = 1050 - 220 + C$ $\Rightarrow 5700 = C$
+
+So,
+
+$N(t) = \frac {1050}{t^3} - 220t + 5700$
+
+------------------------------------------------------------------------
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW13/q3.png)
+
+------------------------------------------------------------------------
+
+We're looking for the rectangle that starts at x = 4.5 and ends at x =
+8.5
+
+$\int_{4.5}^{8.5} 2x - 9dx$
+
+$=\left. \ {x^2} -9x \right|_{4.5}^{8.5}$
+
+Area = $(8.5^2 - 9(8.5)) - (4.5^2 - 9(4.5)) \Rightarrow 16$
+
+------------------------------------------------------------------------
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW13/q4.png)
+
+------------------------------------------------------------------------
+
+$x^2 - 2x -2 = x + 2 \Rightarrow$\
+$x^2 - 3x - 4 = 0 \Rightarrow$ $(x - 4)(x + 1)$
+
+$x = 4, x = -1$
+
+$\int_{-1}^{4} (x+2)-(x^2-2x-2)dx \Rightarrow$\
+$\int_{-1}^{4} -x^2+3x+4dx$
+
+$=\left. \ \frac{-x^3}{3}+ \frac{3x^2}{2} +4x \right|_{-1}^{4}$
+
+Area =
+$(\frac{-4^3}{3}+ \frac{3*(4)^2}{2} +4(4)) - (\frac{-(-1)^3}{3}+ \frac{3*(-1)^2}{2} +4(-1)) \Rightarrow$
+
+$\frac{125}{6} = 20.83$
+
+```{r}
+y1 = function(x){x^2 - (2*x) - 2}
+y2 = function(x){x + 2}
+
+int_1 = integrate(y1, lower = -1, upper = 4)
+int_2 = integrate(y2, lower = -1, upper = 4)
+
+area = int_2$value - int_1$value
+area
+```
+
+------------------------------------------------------------------------
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW13/q5.png)
+
+------------------------------------------------------------------------
+
+Let $x$ = number of irons per order.
+
+Then $n$ = number of sales per year (110)
+
+Then $\frac{n}{x}$ is the number of orders per year ($\frac{110}{x}$)
+
+*Annual storage cost* is $3.75 * \frac{x}{2} = 1.875x$\
+*Annual ordering cost* is $8.25 * \frac{110}{x} = \frac{907.5}{x}$\
+*Annual inventory cost* $f(x)$ is *annual storage cost + annual ordering
+cost* $\Rightarrow 1.875x + \frac{907.5}{x}$
+
+To find the minimum value, find $f'(x) = 0$
+
+$f(x) = 1.875x + \frac{907.5}{x} \Rightarrow$
+
+$f'(x) = 1.875 -\frac{907.50}{x^2}$\
+$0 = 1.875 -\frac{907.50}{x^2}$\
+$\frac{907.50}{x^2} = 1.875$\
+$x = 22$
+
+Since the ideal lot size is $\frac{n}{x}$, the ideal size is
+$\frac{110}{22} \Rightarrow 5$, and the ideal number of orders is 22.
+
+```{r}
+
+```
+
+------------------------------------------------------------------------
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW13/q6.png)
+
+------------------------------------------------------------------------
+
+Let $u = ln(9x)$, then $\frac{du}{dx} = \frac{1}{x}$ and
+$du = \frac{1}{x}dx$,\
+Let $dv = x^6$, then $v = \frac{1}{7}x^7$
+
+Integrating,
+
+$uv-\int vdu \Rightarrow$
+
+$\frac{x^{7}ln(9x)}{7}-\int \frac{1}{7}x^{7}\frac{1}{x}dx$\
+$\frac{x^{7}ln(9x)}{7}-\frac{1}{7} \int \frac{x^{7}}{x}dx$\
+$\frac{x^{7}ln(9x)}{7}-\frac{1}{7}\int x^{6}dx$  
+$\frac{x^{7}ln(9x)}{7}-\frac{1}{7}(\frac{x^{7}}{7})+C$  
+$\frac{x^{7}ln(9x)}{7}-\frac{x^{7}}{49}+C$
+
+------------------------------------------------------------------------
+
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW13/q7.png)
+
+------------------------------------------------------------------------
+
+$\int_1^{e^6}\frac{1}{6x} dx$  
+$= \frac{1}{6} ln(x)|_1^{e^6}$  
+$= \frac{1}{6} ln(e^6) - \frac{1}{6} ln(1)$  
+$= \frac{1}{6} * 6 - \frac{1}{6} * 0$  
+$= 1$
+
+The definite integral is 1, so it is on the interval $[1, e^6]$

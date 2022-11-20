@@ -1,0 +1,21 @@
+---
+title: "DATA 605 Discussion Post 13"
+author: "Josh Iden"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+![](/Users/joshiden/Downloads/Screenshot 2022-11-16 at 12.33.31 PM.png)
+
+```{r}
+r = 0.5 #radius cm = 1/2 diameter
+dr = 0.1 #accuracy 1mm = 0.1cm
+V = expression(4/3*pi*r^3) # volume of a sphere
+vr = D(V, "r") # first derivative: v'(r)
+dV = round(eval(vr) * dr, 5) # propagated error: dV = vr * +/- dr
+print(paste("+/-",dV))
+```
+

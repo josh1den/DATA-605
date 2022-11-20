@@ -15,11 +15,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Mulitple Regression from WHO data
 
-```{r}
+```{r message=FALSE}
 library(tidyverse)
+library(knitr)
+library(kableExtra)
 url = "https://raw.githubusercontent.com/josh1den/DATA-605/main/HW/HW12/who.csv"
 df = read.csv(url)
-head(df)
+kable(head(df), align="c") |>
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
 ```{r}
@@ -50,17 +53,20 @@ The **P-value** of 7.71e-14 is very small and significant. This means there is a
 
 The takeaway is total expenditures is relevant life expectancy, but doesn't fully explain it. More is needed.
 
-![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/HW12/Questions/q2.png)
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW12/Questions/q2.png)
+
 ```{r}
 ggplot(df, aes(x=TotExp^0.06, y=LifeExp^4.6)) + 
   geom_point() +
   geom_smooth(se=FALSE) +
   labs(title = "Total Expenditures vs. Life Expectancy", x="Total Expenditures ^0.06", y="Life Expectancy ^4.6")
 ```
+
 ```{r}
 df.lm2 = lm(I(LifeExp^4.6) ~ I(TotExp^0.06), df)
 summary(df.lm2)
 ```
+
 The **F-statistic** is still comparing a single linear model, so it is not relevant.
 
 The **R-squared** of 0.73 indicates Total Expenditures accounts for only 73% of the variance in Life Expectancy, which is much stronger than the previous model.
@@ -69,9 +75,9 @@ The **Standard Error** of 46817945 for the intercept and 27518940 for the slope 
 
 The **P-value** of 2.2e-16 is very small, in line with the previous model which indicates total expenditures is relevant to life expectancy.
 
-The takeaway is that this model better explains the variance between the variables, but because the standard is larger, does not accurately predict them. 
+The takeaway is that this model better explains the variance between the variables, but because the standard is larger, does not accurately predict them.
 
-![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/HW12/Questions/q3.png)
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW12/Questions/q3.png)
 
 Given the equation $𝑌 = mx + b$ where $m$ is the slope, $b$ is the intercept, and $x, Y$ are points on the line:
 
@@ -91,24 +97,25 @@ print(paste("When TotExp^.06=1.5, Life Expectancy is",inv_1))
 print(paste("When TotExp^.06=2.5, Life Expectancy is",inv_2))
 ```
 
-![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/HW12/Questions/q4.png)
-![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/HW12/Questions/q4a.png)
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW12/Questions/q4.png) ![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW12/Questions/q4a.png)
 
 ```{r}
 df.lm3 = lm(LifeExp ~ PropMD + TotExp + PropMD*TotExp, df)
 summary(df.lm3)
 ```
+
 The **F-statistic** is very similar to the R-squared value, which suggests removing a variable will have a negligable affect to the model's reliability.
 
 The **R-squared** of 0.35 is low, indicating the combined variables account for 35% of the variability of life expectancy.
 
-The **Standard Error** for the intercept, total expenditures, and proportion of doctors to total expenditures is very low, indicating low variability, while proportion of doctors has high variability. 
+The **Standard Error** for the intercept, total expenditures, and proportion of doctors to total expenditures is very low, indicating low variability, while proportion of doctors has high variability.
 
 The **P-value**s are all low, indicating the variables are all significant.
 
 Takeaway - this model does not model the data as well as the previous model, however neither model is reliable at prediction.
 
-![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/HW12/Questions/q5.png)
+![](/Users/joshiden/Documents/Classes/CUNY%20SPS/Fall%202022/DATA%20605%20/HW/DATA-605/HW/HW12/Questions/q5.png)
+
 ```{r}
 b0 = df.lm3$coefficients[1]
 b1 = df.lm3$coefficients[2]
@@ -119,4 +126,4 @@ pred = b0 + .03*b1 + 14*b2 + .03*14*b3
 print(pred)
 ```
 
-It does not seem realistic that increasing the percent of doctors can lead to a life expectancy of nearly 108 years! 
+It does not seem realistic that increasing the percent of doctors can lead to a life expectancy of nearly 108 years!
