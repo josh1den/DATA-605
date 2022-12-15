@@ -1,0 +1,821 @@
+---
+title: "DATA 605 Final Exam"
+author: "Josh Iden"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    highlight: kate
+    self_contained: true
+    code_folding: show
+    thumbnails: false
+    gallery: true
+    df_print: kable
+pkgdown:
+  as_is: true 
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+# Problem 1: PageRank
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR1.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR2.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR3.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR4.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR5.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR6.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR7.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR8.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR9.png)  
+
+## Problem Set {.tabset}
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/PAGERANK/PR10.png)  
+
+### Solution 1  
+
+Form the $A$ matrix. Then introduce decay and form the $B$ matrix as we did in the course notes. 
+
+```{r 1.1.1}
+# form A matrix
+A = matrix(c(0, 1/2, 1/2, 0, 0, 0,
+             0, 0, 0, 0, 0, 0,
+             1/3, 1/3, 0, 0, 1/3, 0,
+             0, 0, 0, 0, 1/2, 1/2,
+             0, 0, 0, 1/2, 0, 1/2,
+             0, 0, 0, 1, 0, 0),
+           nrow =6,
+           byrow= TRUE)
+```
+
+Since row 2 is filled with zeros, we replace with the probability of landing on any of the pages: 1/6
+
+```{r 1.1.2}
+# replace row 2 
+A[2,] = rep(1/6, 6)
+A
+```
+Introduce decay and form the B matrix. 
+
+```{r 1.1.3}
+d = 0.85 # decay
+n = 6 # number of pages
+
+B = d * A + ((1-d)/n)
+B
+```
+
+### Solution 2  
+
+Start with a uniform rank vector $r$ and perform power iterations on $B$ till convergence. That is, compute the solution $r = B^n \times r$. Attempt this for a sufficiently large $n$ so that $r$ actually converges.  
+
+```{r 1.2.1}
+library(matrixcalc)
+
+# define uniform rank vector: r 
+r = rep(1/n, n)
+
+# find convergence at n
+n = 10
+matrix.power(t(B), n) %*% r
+```
+
+```{r 1.2.2}
+n = 20
+matrix.power(t(B), n) %*% r
+```
+```{r 1.2.3}
+n = 30
+matrix.power(t(B), n) %*% r
+```
+```{r 1.2.4}
+n = 40
+matrix.power(t(B), n) %*% r
+```
+```{r 1.2.5}
+n = 50
+matrix.power(t(B), n) %*% r
+```
+```{r 1.2.6}
+all.equal(matrix.power(t(B),40) %*% r, matrix.power(t(B),50) %*% r)
+```
+```{r 1.2.7}
+# store the convergence
+convergence = matrix.power(t(B), 40) %*% r
+```
+
+### Solution 3  
+
+Compute the eigen-decomposition of $B$ and verify that you indeed get an eigenvalue of 1 as the largest eigenvalue and that its corresponding eigenvector is the same vector that you obtained in the previous power iteration method. Further, this eigenvector has all positive entries and it sums to 1.  
+
+```{r 1.3.1}
+eig_decomp = eigen(B)
+eig_decomp
+```
+We can see 1 is the largest eigenvalue. 
+
+Sum the orresponding eigenvector:
+
+```{r 1.3.2}
+sum(as.numeric(eig_decomp$vectors[,1]/sum(eig_decomp$vector[,1])))
+```
+
+### Solution 4  
+
+Use the *graph* package in R and its *page.rank* method to compute the Page Rank of the graph as given in $A$. Note that you don't need to apply decay. The package starts with a connected graph and applies decay internally. Verify that you do get the same PageRank vector as the two approaches above. 
+
+```{r 1.4.1, warning=FALSE, message=FALSE}
+library(igraph)
+
+# graph the matrix A
+A_graph = graph_from_adjacency_matrix(A, weighted=TRUE)
+plot(A_graph)
+```
+  
+  
+Verify equality with convergence vector. 
+
+```{r 1.4.2}
+page.rank(A_graph)
+```
+```{r 1.4.3}
+convergence
+```
+
+
+```{r 1.4.4}
+all.equal(page.rank(A_graph)$vector, convergence[,1])
+```
+# Problem 2: Digit Recognizer  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/DIGIT/Digit1.png)  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/DIGIT/Digit2.png)  
+
+
+## Problem Set {.tabset}  
+
+### Step 1 
+
+Sign in to Kaggle.
+
+### Step 2
+
+Download the data.  
+
+```{r 2.2.1, warning=FALSE, message=FALSE, cache=TRUE}
+library(tidyverse) 
+
+test_data = '/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/DIGIT/test.csv'
+train_data = '/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/DIGIT/train.csv'
+
+test = read.csv(test_data)
+train = read.csv(train_data)
+
+dim(test)
+dim(train)
+```
+
+### Step 3 
+
+Using the training.csv file, plot representations of the first 10 images to understand the data format. Go ahead and divide all pixels by 255 to produce values between 0 and 1. (This is equivalent to min-max scaling.)  
+
+```{r 2.3.1}
+# plot single image 
+m = matrix(unlist(train[10,-1])/255,nrow = 28,byrow = T)
+image(m)
+```
+```{r 2.3.2}
+# plot first 10 images
+par(mfrow=c(2,5))
+
+for (i in 1:10) {
+  m = matrix(unlist(train[i,-1])/255,nrow = 28,byrow = T)
+  image(t(apply(m,2,rev)),axes=FALSE) # print and reverse matrix
+}
+```
+```{r 2.3.3}
+# print the first 10 labels
+train[1:10,1]
+```
+
+### Step 4  
+
+What is the frequency distribution of the numbers in the dataset?
+
+```{r 2.4.1}
+# frequency distribution table
+freq = table((train[,1])) |>
+  as.data.frame() |>
+  rename(number = Var1, count = Freq) |>
+  mutate(freq = round(prop.table(table((train[,1]))),4))
+
+freq
+```
+
+```{r 2.4.2}
+sum(freq$freq)
+```
+Thanks, rounding. 
+
+```{r 2.4.3}
+ggplot(train, aes(x=train[,1])) +
+  geom_histogram(fill="#69b3a2", color="#e9ecef", alpha=0.9, binwidth=1) +
+  scale_x_continuous(breaks = 0:9) +
+  labs(x='number')
+```
+
+### Step 5  
+
+For each number, provide the mean pixel intensity. What does this tell you?  
+
+```{r 2.5.1}
+train |>
+  mutate(mean_pix = rowMeans(across(where(is.numeric)))) |>
+  group_by(label) |>
+  summarise(mean_pix = mean(mean_pix))
+```
+
+We can see 0 has the highest (brightest) average pixel intensity, while 1 has the lowest. I suspect this represents the information needed to display each number.  
+
+### Step 6  
+
+Reduce the data by using principal components that account for 95% of the variance. How many components did you generate? Use PCA to generate all possible components (100% of the variance). How many components are possible? Why?  
+
+```{r 2.6.1, cache=TRUE}
+library(stats) 
+
+train_pca = prcomp(train[,2:785])
+
+# calculate cumulative variances
+train_cv = (cumsum(train_pca$sdev^2) / sum(train_pca$sdev^2))
+# store components for 95% variance
+train_cv_95 = min(which((train_cv >= .95)))
+train_cv_95
+```
+154 components account for 95% of the variance. 
+
+```{r 2.6.2}
+# total possible components
+train_cv = (cumsum(train_pca$sdev^2) / sum(train_pca$sdev^2))
+train_cv_100 = min(which((train_cv >= 1)))
+train_cv_100
+```
+
+704 components account for 100% of the variance. This indicates a substantial number of components account for very little variance between 95-100%  
+
+### Step 7  
+
+Plot the first 10 images generated by PCA. They will appear to be noise. Why?   
+
+```{r 2.7.1}
+# plot first 10 PCA images
+par(mfrow=c(2,5))
+
+# rotate the PCA matrix
+train_pca_rot = train_pca$rotation
+
+for (i in 1:10) {
+  a = array(train_pca_rot[,i], dim = c(28, 28))
+  image(1:28, 1:28, a, axes=FALSE) 
+}
+```
+
+There's noise here because the components haven't been normalized, and PCA maximizes variance.   
+
+### Step 8  
+
+Now, select only those images that have labels that are 8’s. Re-run PCA that accounts for all of the variance (100%). Plot the first 10 images. What do you see?  
+
+```{r 2.8.1, cache=TRUE}
+# select only 8s  
+eights = train |>
+  filter(label == 8)
+
+# pca  
+eights_pca = prcomp(eights[,2:785])
+
+# calculate cumulative variances
+eights_cv = (cumsum(eights_pca$sdev^2) / sum(eights_pca$sdev^2))
+# store components for 100% variance
+eights_cv_100 = min(which((eights_cv >= 1)))
+```
+
+```{r 2.8.2, cache=TRUE}
+# plot first 10 images
+par(mfrow=c(2,5))
+
+# rotate the eights PCA matrix
+eights_pca_rot = eights_pca$rotation
+
+for (i in 1:10) {
+  a = array(eights_pca_rot[,i], dim = c(28, 28))
+  image(1:28, 1:28, a, axes=FALSE)
+}
+```
+  
+  
+The images are still noisy, but clearer than the full set, and appear to go from clearest to blurriest. This is likely because only 248 variables are needed to account for 100% variance in this model, so there appears to be much less overall variance.    
+
+### Step 9  
+
+An incorrect approach to predicting the images would be to build a linear regression model with
+y as the digit values and X as the pixel matrix. Instead, we can build a multinomial model that
+classifies the digits. Build a multinomial model on the entirety of the training set. Then provide
+its classification accuracy (percent correctly identified) as well as a matrix of observed versus
+forecast values (confusion matrix). This matrix will be a 10 x 10, and correct classifications will
+be on the diagonal. (10 points)  
+
+```{r 2.9.1, cache=TRUE}
+library(nnet)  
+
+# build multinomial model 
+model = multinom(label ~ ., train, MaxNWts=50000)  
+```
+```{r 2.9.2}
+library(caret) 
+
+# test accuracy  
+predictions = predict(model, train)
+mtab = table(predictions, train$label)
+confusionMatrix(mtab)
+```
+
+The classification model is 89% accurate.  
+
+# Problem 3: House Prices  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/HOUSE_PRICES/house1.png)
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/HOUSE_PRICES/house2.png)  
+  
+## Problem Set {.tabset}  
+
+
+### Step 1 
+
+*Descriptive and Inferential Statistics*. Provide univariate descriptive statistics and appropriate plots for
+the training data set. Provide a scatterplot matrix for at least two of the independent variables and the
+dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset. Test
+the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80%
+confidence interval. Discuss the meaning of your analysis. Would you be worried about familywise
+error? Why or why not?  
+
+```{r 3.1.1, cache=TRUE}
+house_train = read.csv('/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/HOUSE/train.csv')
+house_test = read.csv('/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/HOUSE/test.csv')
+
+names(house_train)
+dim(house_train)
+```
+```{r 3.1.2}
+summary(house_train)
+```
+  
+```{r 3.1.3}
+dim(house_train)
+```
+We have 1460 rows and 81 columns of data. 
+
+```{r 3.1.4}
+ggplot(house_train, aes(x=SalePrice)) +
+  geom_histogram(fill="#69b3a2", color="#e9ecef", alpha=0.9, binwidth=10000) +
+  labs(x = 'Sale Price')
+```
+
+
+```{r 3.1.5}
+ggplot(house_train, aes(x=OverallCond)) +
+  geom_histogram(fill="#69b3a2", color="#e9ecef", alpha=0.9, binwidth=1) +
+  labs(x = 'Overall Condition')
+```
+
+```{r 3.1.6}
+ggplot(house_train, aes(x=YearBuilt)) +
+  geom_histogram(fill="#69b3a2", color="#e9ecef", alpha=0.9, binwidth=10) +
+  labs(x = 'Year Built')
+```
+  
+  
+Scatterplot Sale Price vs. Lot Area & Overall Condition:
+
+```{r 3.1.7}
+ggplot(house_train, aes(TotRmsAbvGrd, SalePrice)) +
+  geom_jitter(aes(color=OverallCond), size=3) +
+  labs(x='Rooms Above Ground', y='Sale Price') +
+  scale_color_continuous(name='Overall Condition')
+
+```
+  
+  
+Derive a correlation matrix for any three quantitative variables in the dataset.  
+
+```{r 3.1.8}
+# vector of desired columns 
+cols = c('YearBuilt','OverallCond','TotRmsAbvGrd','SalePrice')
+cor_mat = cor(house_train[,cols])
+cor_mat
+```
+  
+  
+Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80%
+confidence interval.
+  
+  
+$H_0:$ The correlation between each pairwise set of variables with 80% confidence is 0.  
+$H_A:$ The correlation between each pairwise set of variables with 80% confidence is not 0.
+
+
+```{r 3.1.9}
+cor.test(house_train$SalePrice, house_train$YearBuilt, conf.level = 0.8)
+```
+
+We see there is a pretty strong positive correlation between Sale Price and Year Built. 
+
+```{r 3.1.10}
+cor.test(house_train$SalePrice, house_train$OverallCond, conf.level = 0.8)
+```
+```{r 3.1.11}
+cor.test(house_train$SalePrice, house_train$TotRmsAbvGrd, conf.level = 0.8)
+```
+There are strong correlations between the Sales Price, Overall Condition, and Total Rooms Above Ground. We reject the null hypthosis that the correlation between the variables is 0. 
+
+Given the formula to estimate familywise error, 
+
+$FWE = 1 - (1-α)^n$ where $α$ is the significance level for a single hypothesis test, and $n$ is the total number of tests, we have:
+
+```{r 3.1.12}
+n = 3 # number of tests
+a = 0.05 # alpha
+FWE = function(n, a){
+  1 - (1-a)^n
+}
+
+FWE(n,a)
+```
+The estimated familywise error is 14%, so there is a 14% chance of coming to one or more false conclusions. 
+
+### Step 2  
+
+*Linear Algebra and Correlation*. Invert your correlation matrix from above. (This is known as the
+precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix
+by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU
+decomposition on the matrix.
+
+```{r 3.2.1}
+#invert the correlation matrix
+prec_mat = solve(cor_mat)
+prec_mat
+```
+```{r 3.2.2}
+# multiply the correlation matrix by the precision matrix
+cor_mat %*% prec_mat
+```
+```{r 3.2.3}
+# multiply the precision matrix by the correlation matrix
+prec_mat %*% cor_mat
+```
+```{r 3.2.4}
+# conduct LU decomposition on the matrix
+c_mat_decomp = lu.decomposition(cor_mat)
+
+c_mat_decomp
+```
+
+### Step 3  
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/HOUSE_PRICES/step3.png)    
+
+Recalling an earlier histogram, we can see that sale price is right-skewed.
+
+```{r 3.3.1}
+ggplot(house_train, aes(x=SalePrice)) +
+  geom_histogram(fill="#69b3a2", color="#e9ecef", alpha=0.9, binwidth=10000) +
+  labs(x = 'Sale Price')
+```
+
+And this checks out, as the mean sale price is higher than its median. 
+
+```{r 3.3.2}
+mean(house_train$SalePrice) - median(house_train$SalePrice)
+```
+
+```{r 3.3.3}
+min(house_train$SalePrice)
+```  
+
+The minimum value is above 0, so no shifting is necessary. 
+
+```{r 3.3.4, message=FALSE, warning=FALSE}
+library(MASS)
+
+# find optimal value
+lambda = fitdistr(house_train$SalePrice, densfun = 'exponential')
+lambda
+```
+```{r 3.3.5}
+# take 1000 samples using optimal value
+samps = rexp(1000, lambda$estimate)
+```
+
+```{r 3.3.6}
+par(mfrow=c(1,2))
+hist(house_train$SalePrice, breaks=40, xlab='Price', main='Sale Price')
+hist(samps, breaks=40, xlab='Samples', main='Fitted Distribution')
+```
+  
+  
+Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data.    
+
+
+```{r 3.3.7}
+# 5th percentile, labmda
+lambda_5p = qexp(.05, rate=lambda$estimate)
+lambda_5p
+```
+```{r 3.3.8}
+# 95th percentile, lambda
+lambda_95p = qexp(.95, rate=lambda$estimate)
+lambda_95p
+```
+```{r 3.3.9}
+# 5th percentile, empirical 
+house_5p = quantile(house_train$SalePrice, 0.05)
+house_5p
+```
+```{r 3.3.10}
+# 95th percentile, empirical
+house_95p = quantile(house_train$SalePrice, 0.95)
+house_95p
+```
+```{r 3.3.11}
+summary(house_train$SalePrice)
+```
+```{r 3.3.12}
+summary(samps)
+```  
+
+  
+We can see the samples shifted the data towards a minimum of 0 and actually increased the right skew.  
+
+### Step 4  
+
+*Modeling.* Build some type of multiple regression model and submit your model to the competition board. Provide your complete model summary and results with analysis. Report your Kaggle.com user name and score.
+
+I'm going to see if the data satisfies the conditions for simple linear regression. To start, I will isolate the numeric variables and take a look at a pairs plot to see which variables appear to have linear relationships. 
+
+```{r 3.4.1}
+# copy the numeric columns to a new datafram: model.df
+model.df = house_train |>
+  dplyr::select(-Id) |>
+  keep(is.numeric)
+
+glimpse(model.df)
+```
+
+I see some columns with NAs. Let's take a look. 
+
+```{r 3.4.2}
+colSums(is.na(model.df))
+```
+Looks like LotFrontage, MasVnrArea,and GarageYrBlt have NAs, though not many. 
+
+LotFrontage = Linear feet of street connected to property 
+MasVnrArea = Masonry Veneer Area  
+GarageYrBlt = Garage Year Built  
+
+I think these columns could all be useful to our model, so rather than remove the columns or impute the NAs, I'm simply going to remove the rows with these NAs, since it's only a maximum of about 350 out 1460 observations. 
+
+```{r 3.4.3}
+model.df = model.df |>
+  na.omit()
+
+glimpse(model.df)
+```
+
+This removes 339 rows from our data. If the variables prove insignificant to the model, I will restore the rows to the data. Now let's take a look at a pairs plot to observe which variables may have a linear relationship. 
+
+Now let's take a look at the linear regression model. 
+
+```{r 3.4.4}
+model.full = lm(SalePrice ~ ., model.df)
+summary(model.full)
+model.full.pvals = summary(model.full)$coefficients[,4] 
+```
+
+We see a number of variables that don't appear to be significant to the model, but we do an adjusted R-squared of 80%, which is a good start. GarageYrBlt doesn't look like it will be significant so I am going to remove that column and restore the observations we removed in order to utilize that variable without NAs. Masonry Veneer Area is highly significant, and Lot Frontage may be, so we will keep those for now. 
+
+We can also remove TotalBsmtSF, GrLivArea, which are not defined due to singularities, and OpenPorchSF, YrSold, EnclosedPorch, HalfBath, BsmtHalfBath, MoSold, MiscVal, and GarageArea, which are not significant.
+
+
+```{r 3.4.5}
+cols = c('Id', 'GarageYrBlt', 'TotalBsmtSF', 'GrLivArea', 'OpenPorchSF', 'YrSold', 'EnclosedPorch', 'HalfBath', 'BsmtHalfBath', 'MoSold', 'MiscVal', 'GarageArea')
+
+model.df2 = house_train |>
+  dplyr::select(-cols) |>
+  keep(is.numeric) |>
+  na.omit()
+```
+
+```{r 3.4.6}
+model.v2 = lm(SalePrice ~., model.df2)
+summary(model.v2)
+```
+
+The model seems to be improving. The adjusted R-squared remains at 80%, and the residuals deviance is approaching symmetry. Let's remove X3SsnPorch and BsmtFinSF2 from the model and try again.
+
+```{r 3.4.7}
+cols = c('X3SsnPorch','BsmtFinSF2')
+model.df3 = model.df2 |>
+  dplyr::select(-cols) 
+
+model.v3 = lm(SalePrice ~., model.df3)
+summary(model.v3)
+```
+
+Removing LotFrontage, LowQualFinSF, BsmUnfSF and we should be good to go. 
+
+```{r 3.4.8}
+cols = c('LotFrontage','LowQualFinSF','BsmtUnfSF')  
+model.df4 = model.df3 |>
+  dplyr::select(-cols) 
+
+model.v4 = lm(SalePrice ~., model.df4)
+summary(model.v4)
+```
+
+Now we see that all variables in our model have significance. Let's take a look at the residuals to observe if they meet the conditions for linear regression. 
+
+```{r 3.4.9}
+hist(model.v4$residuals)
+```
+  
+  
+The residuals are normally distributed... good.  
+
+
+```{r 3.4.10}
+plot(model.v4)
+```
+
+We can see the residuals are somewhat non-linear. and somewhat right-skewed. We can observe that they're somewhat homoskedactic, but there are outliers affecting the model. Let's try reducing the model to the *most* significant variables and see if this improves the fit. 
+
+```{r 3.4.11}
+pvals = summary(model.v4)$coefficients[-1,4]
+
+pvals |>  
+  as.data.frame() |>
+  arrange(pvals)
+```
+
+Let's keep the remaining variables at least r negative decimals places, so the 12 most significant variables. 
+
+```{r 3.4.12}
+val_names = pvals |>  
+  as.data.frame() |>
+  arrange(pvals) |>
+  tail(8) |>
+  row.names()
+```
+
+
+```{r 3.4.13}
+model.df5 = model.df4 |>
+  dplyr::select(-val_names)  
+
+model.v5 = lm(SalePrice ~., model.df5)
+summary(model.v5)
+```
+
+So we lose a little bit of R-squared, and it seems the residuals deviance is more asymetrical, let's take a look at the residuals. 
+
+```{r 3.4.14}
+hist(summary(model.v5)$residuals)
+```
+  
+```{r 3.4.15}
+plot(model.v5)
+```
+  
+We don't observe any noticeable improvement in the residuals with this model. Taking a closer look at the data, we learn that MSSubClass is a categorical data column describing the class of the buildings. 
+
+```{r 3.4.16, cache=TRUE}
+plot(SalePrice ~ MSSubClass, model.df5)
+```
+
+Let's remove this variable from the model and see if it improves the fit. 
+
+```{r 3.4.17}
+model.df6 = model.df5 |>
+  dplyr::select(-MSSubClass)
+
+model.v6 = lm(SalePrice ~., model.df6)
+summary(model.v6)
+```
+
+```{r 3.4.18}
+hist(summary(model.v6)$residuals)
+```
+```{r 3.4.19}
+plot(model.v6)
+```  
+  
+  
+Again, no improvement. Let's try reducing to the variables with the highest t-values and see how the model fits. 
+
+```{r 3.4.20}
+t_vals = summary(model.v6)$coefficients[-1,3] 
+
+t_vals |>
+  as.data.frame() |>
+  arrange(desc(t_vals))
+```
+
+```{r 3.4.21, warning=FALSE, message=FALSE}
+vals = t_vals |>
+  as.data.frame() |>
+  arrange(desc(t_vals)) |>
+  head(5) |>
+  row.names()
+
+model.df7 = model.df6 |>
+  dplyr::select(c(vals, 'SalePrice'))
+
+model.v7 = lm(SalePrice ~ ., model.df7)
+summary(model.v7)
+```
+
+We see haven't lost much R-squared, and the residuals deviance symmetry improves. 
+
+```{r 3.4.22}
+hist(summary(model.v7)$residuals)
+```
+```{r 3.4.23}
+plot(model.v7)
+```  
+
+Still not good. Previously I've bypassed producing pairs plots to observe the relationship between the data because the number of variables was grinding my machine to a halt, but now we've subset far enough down to take a look:
+
+```{r 3.4.24, message=FALSE, warning=FALSE, cache=TRUE}
+library(GGally) 
+
+ggpairs(model.df7)
+```  
+
+We see overall quality and garage cars are discrete variables, and X2ndFlrSF has many 0s as not every house has a second floor. What happens if we create a third column, combining first and second floor square footage, include the interaction between YearBuilt and OverallQuality and fit SalePrice against that?
+
+```{r 3.4.25}
+cols = c('X1stFlrSF','X2ndFlrSF','SalePrice','YearBuilt','OverallQual')
+model.df8 = model.df7 |>
+  dplyr::select(cols) |>
+  mutate(CombineFtg = X1stFlrSF + X2ndFlrSF)
+```
+
+```{r 3.4.26}
+model.v8 = lm(SalePrice ~ OverallQual*YearBuilt + CombineFtg, model.df8)
+summary(model.v8)
+```
+```{r 3.4.27}
+hist(model.v8$residuals)
+```
+```{r 3.4.28}
+plot(model.v8)
+```
+
+We now observe all variables are signficant, the adjusted R-squared of 75% is acceptable, and the distribution of residuals is close enough to satisfying the conditions of simple linear regression. Now we can use this model to make predictions on the test data and observe our accuracy. First we have to transform the test data to match our training data.  
+
+```{r 3.4.29, cache=TRUE}
+test_tran = house_test |>
+  mutate(CombineFtg = X1stFlrSF + X2ndFlrSF)
+
+predictions = predict(model.v8, test_tran)
+predictions = predictions |>
+  as.data.frame() |>
+  mutate(Id = test_tran$Id) |>
+  rename(SalePrice = predictions) |>
+  dplyr::select(c(2,1))
+
+head(predictions)
+```
+
+```{r 3.4.30}
+write.csv(predictions,'/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/predictions.csv', row.names=FALSE)
+```
+
+![](/Users/joshiden/Documents/Classes/CUNY SPS/Fall 2022/DATA 605 /HW/DATA-605/HW/FINAL EXAM/IMAGES/KAGGLE/predictions.png)   
+
+My Kaggle profile: []('https://www.kaggle.com/joshiden') 
+
+Unfortunately these predictions did not provide accurate results. In retrospect I think the data required further tranformations in order to make more accurate predictions. Thanks for reading!
+
